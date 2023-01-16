@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"errors"
+	"flag"
 	"fmt"
 	"github.com/88250/gulu"
 	"github.com/dop251/goja"
@@ -41,7 +42,7 @@ const (
 var (
 	excelHeader = []string{"皮肤id", "所属武将", "武将英文", "皮肤名称", "前缀", "是否是真动皮"}
 	config      Config
-	apkPath     = "/home/yscl/tmp/手杀/sgs412" // apk路径
+	apkPath     = "" // apk路径
 )
 
 type Args struct {
@@ -66,8 +67,14 @@ type SkinInfo struct {
 	IsReal    bool     // 是否是真动皮
 }
 
+func Init() {
+	flag.StringVar(&apkPath, "apkPath", "./sgs", "请输入解压后的三国杀apk路径")
+}
+
 // 初始化
 func initial() error {
+	Init()
+	flag.Parse()
 	viper.SetConfigFile("./config.yml")
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
@@ -82,6 +89,10 @@ func initial() error {
 	if err := viper.Unmarshal(&config); err != nil {
 		fmt.Println(err)
 		return errors.New("配置文件错误")
+	}
+	fmt.Println("apkPath: ", apkPath)
+	if !gulu.File.IsExist(apkPath) {
+		return errors.New("三国杀路径错误")
 	}
 	return nil
 }
@@ -99,6 +110,8 @@ func main() {
 	createExcel(skinIds)
 
 	genDynamicSkinParams()
+
+	fmt.Println("end!!!!")
 }
 
 // 提取手杀的所有动皮, 创建文件夹, 存放.
@@ -110,11 +123,6 @@ func createInitialData() []string {
 	horSkinP := filepath.Join(apkPath, horSkinPath)
 	audioEffectP := filepath.Join(apkPath, effectPath)
 	audioskillP := filepath.Join(apkPath, skillPath)
-
-	if !gulu.File.IsExist(dsp) {
-		fmt.Println("三国杀路径不存在")
-		return nil
-	}
 
 	// 获取音效的集合, 以皮肤id为键值, 值为对应的音效列表
 	audios, _ := ioutil.ReadDir(audioskillP)
@@ -293,9 +301,8 @@ func genDynamicSkinParams() {
 	toOutputMap := make(map[string]map[string]interface{})
 	toOutputExtendMap := make(map[string]string)
 
-	for _, f := range files {
+	for idx, f := range files {
 		numKey := f.Name()
-		fmt.Println(numKey)
 		key := ""
 		if info, ok := skinInfoMap[numKey]; ok {
 			curDir := path.Join(outputSkin, numKey)
@@ -314,6 +321,7 @@ func genDynamicSkinParams() {
 			if dsPath == "" {
 				continue
 			}
+			fmt.Println(fmt.Sprintf("<%d> [%s]: 动皮: %s", idx, info.WuJiangCn, info.Name))
 			if !gulu.File.IsExist(path.Join(finalDynamicSkin, info.WuJiangCn, info.Name)) {
 				_ = gulu.File.CopyDir(dsPath, path.Join(finalDynamicSkin, info.WuJiangCn, info.Name))
 

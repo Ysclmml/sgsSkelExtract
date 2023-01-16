@@ -337,6 +337,18 @@ var dynamicSkin = {
 			scale: 0.65,
 			background: 'skin_mayunlu_ZhanChang_bg.png',
 		},
+		牛年春节: {
+			x: [0, 0.5],
+			y: [0, 0.5],
+			scale: 0.5,
+			name: "马云騄/牛年春节/XingXiang",
+			beijing: {
+				x: [0, 0.6],
+				y: [0, 0.6],
+				scale: 0.5,
+				name: "马云騄/牛年春节/BeiJing",
+			},
+		},
 	},
 	panshu:{
 		繁囿引芳:{
