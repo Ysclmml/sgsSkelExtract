@@ -11,10 +11,18 @@ config.yml文件有生成的默认动皮的待机攻击和背景参数, 可以�
 ```shell
 ./linux-run -apkPath=三国杀路径
 ```
+#### windows:
+```shell
+.\window-run.exe -apkPath D:\Game\三国杀\手杀\sgs412
+```
 
 ### 编译
 需要go环境1.18以上. 
 ```shell
 # linux 
 go build -o linux-run .
+
+# windows
+go build -o window-run.exe . 
 ```
+
